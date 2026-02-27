@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Quiz App</title>
+    <link rel="icon" href="IMAGES/quiz app.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: #667eea;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        h2 {
+            color: #555;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+        
+        /* Setup Screen */
+        .setup-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+            font-weight: bold;
+        }
+        
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .btn:hover {
+            background: #764ba2;
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        /* Quiz Screen */
+        .quiz-header {
+            margin-bottom: 20px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #f0f0f0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #667eea;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            color: #666;
+        }
+        
+        .timer {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .timer.warning {
+            color: red;
+        }
+        
+        .options {
+            display: grid;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .option {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1rem;
+        }
+        
+        .option:hover {
+            background: #f0f0f0;
+        }
+        
+        .option.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .option.correct {
+            background: #4caf50;
+            color: white;
+            border-color: #4caf50;
+        }
+        
+        .option.wrong {
+            background: #f44336;
+            color: white;
+            border-color: #f44336;
+        }
+        
+        .option:disabled {
+            cursor: not-allowed;
+        }
+        
+        /* Results Screen */
+        .result-card {
+            text-align: center;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        
+        .result-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .stat {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .stat-label {
+            display: block;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .stat-value {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            text-align: center;
+        }
+        
+        .success {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .error {
+            background: #f44336;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Setup Screen -->
+        <div id="setupScreen">
+            <h1>📝 Quiz App</h1>
+            
+            <div class="setup-group">
+                <label>Select Category:</label>
+                <select id="category">
+                    <option value="mixed">Mixed Categories</option>
+                    <option value="geography">Geography</option>
+                    <option value="science">Science</option>
+                    <option value="history">History</option>
+                    <option value="entertainment">Entertainment</option>
+                    <option value="sports">Sports</option>
+                </select>
+            </div>
+            
+            <div class="setup-group">
+                <label>Number of Questions:</label>
+                <select id="questionCount">
+                    <option value="3">3 Questions</option>
+                    <option value="5" selected>5 Questions</option>
+                    <option value="10">10 Questions</option>
+                </select>
+            </div>
+            
+            <button class="btn" id="startBtn">Start Quiz</button>
+        </div>
+        
+        <!-- Quiz Screen -->
+        <div id="quizScreen" class="hidden">
+            <div class="quiz-header">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                
+                <div class="stats">
+                    <span id="questionCountDisplay">1/5</span>
+                    <span class="timer" id="timerDisplay">00:30</span>
+                    <span id="scoreDisplay">Score: 0</span>
+                </div>
+            </div>
+            
+            <h2 id="questionText">Loading...</h2>
+            
+            <div class="options" id="optionsContainer"></div>
+            
+            <button class="btn" id="nextBtn" disabled>Next Question</button>
+        </div>
+        
+        <!-- Results Screen -->
+        <div id="resultsScreen" class="hidden">
+            <h1>Quiz Complete! 🎉</h1>
+            
+            <div class="result-card">
+                <div class="score-circle" id="scoreCircle">0%</div>
+                
+                <div class="result-stats">
+                    <div class="stat">
+                        <span class="stat-label">Correct</span>
+                        <span class="stat-value" id="correctCount">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Wrong</span>
+                        <span class="stat-value" id="wrongCount">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Skipped</span>
+                        <span class="stat-value" id="skippedCount">0</span>
+                    </div>
+                </div>
+                
+                <div id="feedbackMessage" class="message success">Great job!</div>
+            </div>
+            
+            <button class="btn" id="restartBtn">Try Again</button>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
